@@ -590,6 +590,22 @@ def sync_bridge_status(session_id, bridge_client_id):
 def serve_index():
     return send_from_directory('.', 'index.html')
 
+@app.route('/api/bridge/health', methods=['GET'])
+def bridge_health():
+    try:
+        payload = wa_bridge.health_check()
+        return jsonify({
+            'ok': True,
+            'bridge_url': wa_bridge.get_bridge_url(),
+            'bridge': payload
+        }), 200
+    except BridgeError as exc:
+        return jsonify({
+            'ok': False,
+            'bridge_url': wa_bridge.get_bridge_url(),
+            'error': str(exc)
+        }), 503
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json

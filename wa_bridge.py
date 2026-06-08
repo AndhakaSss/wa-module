@@ -1,7 +1,7 @@
 import os
 import requests
+from urllib.parse import urlparse, urlunparse
 
-WA_BRIDGE_URL = os.environ.get('WA_BRIDGE_URL', 'http://localhost:3001')
 REQUEST_TIMEOUT = 15
 SEND_TIMEOUT = 180
 
@@ -10,14 +10,49 @@ class BridgeError(Exception):
     pass
 
 
+def get_bridge_url():
+    explicit = (os.environ.get('WA_BRIDGE_URL') or '').strip().rstrip('/')
+    if explicit:
+        return _with_port(explicit, os.environ.get('BRIDGE_PORT', '').strip())
+
+    host = (os.environ.get('BRIDGE_HOST') or '').strip()
+    if host:
+        if not host.startswith('http'):
+            host = f'http://{host}'
+        return _with_port(host.rstrip('/'), os.environ.get('BRIDGE_PORT', '').strip())
+
+    return 'http://localhost:3001'
+
+
+def _with_port(base_url, port):
+    if not port:
+        return base_url
+    parsed = urlparse(base_url)
+    if parsed.port:
+        return base_url
+    host = parsed.hostname or ''
+    netloc = f'{host}:{port}'
+    if parsed.username:
+        auth = parsed.username
+        if parsed.password:
+            auth = f'{auth}:{parsed.password}'
+        netloc = f'{auth}@{netloc}'
+    return urlunparse((parsed.scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment))
+
+
+WA_BRIDGE_URL = get_bridge_url()
+
+
 def _request(method, path, **kwargs):
-    url = f'{WA_BRIDGE_URL}{path}'
+    url = f'{get_bridge_url()}{path}'
     timeout = kwargs.pop('timeout', REQUEST_TIMEOUT)
     try:
         response = requests.request(method, url, timeout=timeout, **kwargs)
     except requests.RequestException as exc:
         raise BridgeError(
-            'WhatsApp bridge is not running. Start it with: cd whatsapp-bridge && npm start'
+            f'Cannot reach WhatsApp bridge at {get_bridge_url()}. '
+            f'On Railway, set WA_BRIDGE_URL=http://${{bridge.RAILWAY_PRIVATE_DOMAIN}}:${{bridge.PORT}} '
+            f'on the web service. ({exc})'
         ) from exc
 
     if response.status_code >= 400:
