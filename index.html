@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Business Hub - Enterprise WhatsApp Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --surface-3: #f1f5f9;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --accent: #059669;
+            --accent-light: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.15);
+            --sidebar-bg: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --overlay: rgba(15, 23, 42, 0.5);
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+        }
+        .dark {
+            --bg: #070b14;
+            --surface: #111827;
+            --surface-2: #1a2332;
+            --surface-3: #243044;
+            --border: #2d3a4f;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent: #34d399;
+            --accent-light: #6ee7b7;
+            --accent-glow: rgba(52, 211, 153, 0.12);
+            --sidebar-bg: #0c1220;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --overlay: rgba(0, 0, 0, 0.75);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.35);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        /* Global dark overrides for hardcoded Tailwind classes */
+        .dark .bg-white { background-color: var(--surface) !important; }
+        .dark .bg-gray-50 { background-color: var(--surface-2) !important; }
+        .dark .bg-gray-100 { background-color: var(--surface-3) !important; }
+        .dark .bg-gray-200 { background-color: var(--border) !important; }
+        .dark .text-gray-900, .dark .text-gray-800, .dark .text-gray-700 { color: var(--text) !important; }
+        .dark .text-gray-600, .dark .text-gray-500, .dark .text-gray-400 { color: var(--text-muted) !important; }
+        .dark .border-gray-200, .dark .border-gray-300 { border-color: var(--border) !important; }
+        .dark .border-b { border-color: var(--border) !important; }
+        .dark .border-t { border-color: var(--border) !important; }
+        .dark .hover\:bg-gray-50:hover { background-color: var(--surface-2) !important; }
+        .dark .hover\:bg-gray-100:hover { background-color: var(--surface-3) !important; }
+        .dark .ring-emerald-50 { --tw-ring-color: rgba(52, 211, 153, 0.2) !important; }
+        .dark .ring-red-50 { --tw-ring-color: rgba(248, 113, 113, 0.2) !important; }
+        .dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.18) !important; }
+        .dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.18) !important; }
+        .dark .text-emerald-600 { color: var(--accent-light) !important; }
+        .dark input, .dark select, .dark textarea {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }
+        .dark input::placeholder, .dark textarea::placeholder { color: var(--text-muted) !important; opacity: 0.7; }
+        .dark input[readonly] { background-color: var(--surface-2) !important; }
+        .dark select option { background: var(--surface); color: var(--text); }
+
+        .ui-sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+        .sidebar-item {
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background: linear-gradient(135deg, #075e54 0%, #128c7e 100%);
+            color: white !important;
+        }
+        .sidebar-item:hover i, .sidebar-item.active i { color: white !important; }
+
+        .ui-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            color: var(--text);
+        }
+        .dark .ui-card {
+            background: linear-gradient(160deg, var(--surface) 0%, var(--surface-2) 100%);
+        }
+        .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .ui-heading { color: var(--text); }
+        .ui-muted { color: var(--text-muted); }
+        .ui-table-head { background: var(--surface-2); }
+        .ui-row { border-color: var(--border); transition: background 0.15s; }
+        .ui-row:hover { background: var(--surface-2); }
+        .campaign-row { cursor: pointer; }
+
+        .theme-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            background: var(--input-bg);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .theme-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .theme-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.875rem;
+        }
+        .theme-btn-secondary {
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .theme-btn-secondary:hover { background: var(--surface-3); }
+        .theme-chip {
+            background: var(--surface-3);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+        }
+
+        .modal-backdrop {
+            background: var(--overlay) !important;
+            backdrop-filter: blur(4px);
+        }
+        .modal-panel {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+        .auth-card {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .qr-container {
+            background: conic-gradient(from 90deg, #075e54, #128c7e, #25d366, #075e54);
+            padding: 4px;
+            border-radius: 20px;
+        }
+        .msg-preview {
+            white-space: pre-wrap;
+            background: var(--accent-glow);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        .file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.65rem;
+            background: var(--accent-glow);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--accent-light);
+        }
+
+        .stat-accent { color: var(--accent-light); }
+        .user-avatar {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+        .page-title { color: var(--text); font-weight: 700; font-size: 1.5rem; }
+
+        @keyframes successPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.08); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-check-ring { animation: successPop 0.45s ease-out; }
+
+        .dark #darkModeToggle:hover { background: var(--surface-3) !important; }
+        .dark .border-green-300 { border-color: rgba(52, 211, 153, 0.4) !important; }
+        .dark .border-emerald-500 { border-color: var(--accent) !important; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-completed { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .badge-running { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
+        .badge-failed { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+        .badge-pending { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
+        .dark .badge-completed { background: rgba(52, 211, 153, 0.18); color: #6ee7b7; }
+        .dark .badge-running { background: rgba(96, 165, 250, 0.18); color: #93c5fd; }
+        .dark .badge-failed { background: rgba(248, 113, 113, 0.18); color: #fca5a5; }
+        .dark .badge-pending { background: rgba(250, 204, 21, 0.18); color: #fde047; }
+        .badge-skipped { background: rgba(148, 163, 184, 0.2); color: #64748b; }
+        .dark .badge-skipped { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+        .badge-paused { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
+        .badge-cancelled { background: rgba(107, 114, 128, 0.2); color: #4b5563; }
+        .dark .badge-paused { background: rgba(251, 146, 60, 0.18); color: #fdba74; }
+        .dark .badge-cancelled { background: rgba(156, 163, 175, 0.18); color: #d1d5db; }
+
+        .campaign-ops-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: opacity 0.15s;
+        }
+        .campaign-ops-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .progress-track {
+            height: 10px;
+            background: var(--surface-3);
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #075e54, #25d366);
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .delivery-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
+        .delivery-table th, .delivery-table td { padding: 0.5rem 0.65rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .delivery-table th { color: var(--text-muted); font-weight: 500; background: var(--surface-2); position: sticky; top: 0; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+<div id="app">
+    <!-- Login View -->
+    <div id="loginView" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-teal-700">
+        <div class="auth-card rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="ri-whatsapp-line text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">WA Business Hub</h2>
+                <p class="text-gray-500 text-sm mt-2">Enterprise WhatsApp Marketing Platform</p>
+            </div>
+            
+            <form id="loginForm">
+                <div id="loginError" class="hidden mb-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
+                <div class="mb-4">
+                    <label class="theme-label">Email Address</label>
+                    <input type="email" id="email" class="theme-input" placeholder="you@example.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="theme-label">Password</label>
+                    <input type="password" id="password" class="theme-input" placeholder="Enter your password" required>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-emerald-600 hover:underline">Forgot password?</a>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition">Sign In</button>
+            </form>
+            
+            <div class="mt-6 text-center text-sm text-gray-500">
+                Don't have an account? <a href="#" id="showSignup" class="text-emerald-600 hover:underline">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup View (Hidden) -->
+    <div id="signupView" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-900 to-teal-700 hidden">
+        <div class="auth-card rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="ri-whatsapp-line text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
+                <p class="text-gray-500 text-sm mt-2">Start your 14-day free trial</p>
+            </div>
+            
+            <form id="signupForm">
+                <div id="signupError" class="hidden mb-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
+                <div class="mb-3">
+                    <input type="text" id="signupCompany" placeholder="Company Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" id="signupEmail" placeholder="Email Address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" required>
+                </div>
+                <div class="mb-3">
+                    <input type="tel" id="signupPhone" placeholder="9876543210" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" required>
+                    <p class="text-xs text-gray-500 mt-1">Local number only — country code set below</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-600 text-sm mb-1">Default country code</label>
+                    <input type="text" id="signupCountryCode" value="91" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" placeholder="91">
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="signupPassword" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" required minlength="6">
+                </div>
+                <button type="submit" id="signupSubmitBtn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-2 rounded-lg font-semibold">Create Account</button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <a href="#" id="showLogin" class="text-sm text-emerald-600 hover:underline">Already have an account? Sign in</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View (Hidden until login) -->
+    <div id="dashboardView" class="hidden">
+        <!-- Sidebar -->
+        <div class="fixed left-0 top-0 h-full w-64 ui-sidebar z-10">
+            <div class="p-6 border-b" style="border-color: var(--border)">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <i class="ri-whatsapp-line text-2xl text-emerald-600"></i>
+                        <span class="font-bold text-xl ui-heading">WA Business Hub</span>
+                    </div>
+                    <button id="darkModeToggle" class="p-2 rounded-lg ui-muted transition-colors" style="background: transparent" title="Toggle dark mode">
+                        <i class="ri-moon-line text-lg" id="darkModeIcon"></i>
+                    </button>
+                </div>
+                <p class="text-xs ui-muted mt-1">v2.1 — Multi-Account</p>
+            </div>
+            
+            <nav class="p-4">
+                <div class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="dashboard">
+                    <i class="ri-dashboard-line text-lg"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="campaigns">
+                    <i class="ri-mail-send-line text-lg"></i>
+                    <span>Campaigns</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="contacts">
+                    <i class="ri-contacts-book-line text-lg"></i>
+                    <span>Contacts</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="whatsapp">
+                    <i class="ri-whatsapp-line text-lg"></i>
+                    <span>WhatsApp Accounts</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="templates">
+                    <i class="ri-file-copy-line text-lg"></i>
+                    <span>Templates</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="analytics">
+                    <i class="ri-bar-chart-2-line text-lg"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition mb-1" data-page="settings">
+                    <i class="ri-settings-3-line text-lg"></i>
+                    <span>Settings</span>
+                </div>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t" style="border-color: var(--border); background: var(--sidebar-bg)">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 user-avatar rounded-full flex items-center justify-center">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium ui-heading" id="userName">John Doe</p>
+                        <p class="text-xs ui-muted" id="userEmail">john@company.com</p>
+                    </div>
+                    <i class="ri-logout-box-line ml-auto ui-muted cursor-pointer hover:text-red-500 transition-colors" id="logoutBtn"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 p-8">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page-content">
+                <h1 class="text-2xl font-bold ui-heading mb-6">Dashboard</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="ui-card rounded-xl p-6 card-hover transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="ui-muted text-sm">Total Messages</span>
+                            <i class="ri-mail-send-line text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold ui-heading" id="totalMessages">0</div>
+                        <div class="text-emerald-600 dark:text-emerald-400 text-sm mt-2 stat-accent" id="messagesWeekStat">0 this week</div>
+                    </div>
+                    
+                    <div class="ui-card rounded-xl p-6 card-hover transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="ui-muted text-sm">Active WhatsApp</span>
+                            <i class="ri-whatsapp-line text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold ui-heading" id="activeAccounts">0</div>
+                        <div class="ui-muted text-sm mt-2" id="totalAccountsLabel">of 0 total (max 15)</div>
+                    </div>
+                    
+                    <div class="ui-card rounded-xl p-6 card-hover transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="ui-muted text-sm">Contacts</span>
+                            <i class="ri-contacts-book-line text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold ui-heading" id="totalContacts">0</div>
+                        <div class="ui-muted text-sm mt-2">in your list</div>
+                    </div>
+                    
+                    <div class="ui-card rounded-xl p-6 card-hover transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="ui-muted text-sm">Success Rate</span>
+                            <i class="ri-bar-chart-2-line text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold ui-heading"><span id="successRate">0</span><span class="text-lg">%</span></div>
+                        <div class="ui-muted text-sm mt-2" id="campaignsFinishedStat">0 campaigns finished</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="ui-card rounded-xl p-6">
+                        <h3 class="font-semibold ui-heading mb-4">Recent Campaigns</h3>
+                        <div class="space-y-3" id="recentCampaigns">
+                            <div class="text-center ui-muted py-8">No campaigns yet. Create your first campaign!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-card rounded-xl p-6">
+                        <h3 class="font-semibold ui-heading mb-4">Message Volume (7 days)</h3>
+                        <canvas id="messageChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns Page -->
+            <div id="page-campaigns" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold ui-heading">Campaigns</h1>
+                    <button id="newCampaignBtn" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="ri-add-line"></i> New Campaign
+                    </button>
+                </div>
+                
+                <p class="text-sm ui-muted mb-4">Click a campaign to view message preview, attachments, and delivery stats.</p>
+                <div class="ui-card rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="ui-table-head border-b dark:border-slate-700">
+                            <tr class="text-left ui-muted text-sm">
+                                <th class="px-6 py-3">Campaign Name</th>
+                                <th class="px-6 py-3">Status</th>
+                                <th class="px-6 py-3">Recipients</th>
+                                <th class="px-6 py-3">Sent</th>
+                                <th class="px-6 py-3">Progress</th>
+                                <th class="px-6 py-3">Created</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="campaignsTableBody">
+                            <tr><td colspan="7" class="text-center py-8 ui-muted">No campaigns yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Contacts Page -->
+            <div id="page-contacts" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="page-title mb-6">Contacts</h1>
+                    <div class="flex gap-3">
+                        <button id="importContactsBtn" class="border border-emerald-500 text-emerald-600 px-4 py-2 rounded-lg flex items-center gap-2">
+                            <i class="ri-upload-line"></i> Import CSV
+                        </button>
+                        <button id="addContactBtn" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                            <i class="ri-add-line"></i> Add Contact
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="ui-card rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="ui-table-head border-b">
+                            <tr class="text-left ui-muted text-sm">
+                                <th class="px-6 py-3">Phone</th>
+                                <th class="px-6 py-3">Name</th>
+                                <th class="px-6 py-3">Vehicle</th>
+                                <th class="px-6 py-3">Tags</th>
+                                <th class="px-6 py-3">Created</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactsTableBody">
+                            <tr><td colspan="6" class="text-center py-8 ui-muted">No contacts. Import CSV or add manually.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Hidden file input for CSV import -->
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            </div>
+
+            <!-- WhatsApp Accounts Page -->
+            <div id="page-whatsapp" class="page-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-bold ui-heading">WhatsApp Accounts</h1>
+                    <button id="addWhatsAppBtn" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="ri-add-line"></i> Add Account
+                    </button>
+                </div>
+                <div class="ui-card rounded-xl p-4 mb-6 border-l-4 border-emerald-500">
+                    <p class="text-sm ui-heading font-medium">Multi-account limits</p>
+                    <p class="text-sm ui-muted mt-1">Link up to <strong id="maxAccountsInfo">15</strong> WhatsApp accounts. We recommend <strong id="recommendedAccountsInfo">5</strong> on one PC for stability. Campaigns rotate across connected accounts — each contact gets <em>one</em> message from <em>one</em> account (not all accounts to the same person).</p>
+                </div>
+                
+                <div id="whatsappAccountsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="text-center ui-muted py-8 col-span-3">No WhatsApp accounts connected. Click "Add Account" to start.</div>
+                </div>
+                
+                <!-- QR Code Modal -->
+                <div id="qrModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+                    <div class="modal-panel rounded-2xl p-6 max-w-sm w-full mx-4">
+                        <h3 class="text-lg font-semibold ui-heading mb-4">Link WhatsApp Account</h3>
+                        <div id="qrCodeContainer" class="qr-container p-2 rounded-2xl">
+                            <div id="qrCanvas" class="w-64 h-64 rounded-xl flex items-center justify-center mx-auto" style="background: var(--surface)">
+                                <span class="ui-muted text-sm">Loading QR...</span>
+                            </div>
+                        </div>
+                        <p id="qrStatus" class="text-sm ui-muted mt-4 text-center">Open WhatsApp → Settings → Linked Devices → Link a Device</p>
+                        <button id="closeQrModal" class="mt-4 w-full theme-btn-secondary py-2">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates Page -->
+            <div id="page-templates" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="page-title">Message Templates</h1>
+                    <button id="newTemplateBtn" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="ri-add-line"></i> New Template
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="templatesList">
+                    <div class="text-center ui-muted py-8 col-span-3">No templates. Create your first template.</div>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="page-analytics" class="page-content hidden">
+                <h1 class="text-2xl font-bold ui-heading mb-6">Analytics</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="ui-card rounded-xl p-6">
+                        <h3 class="font-semibold ui-heading mb-4">Campaign Status</h3>
+                        <canvas id="deliveryChart" height="200"></canvas>
+                    </div>
+                    <div class="ui-card rounded-xl p-6">
+                        <h3 class="font-semibold ui-heading mb-4">Messages by Hour</h3>
+                        <canvas id="hoursChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page-content hidden">
+                <h1 class="text-2xl font-bold ui-heading mb-6">Settings</h1>
+                <div class="ui-card rounded-xl p-6 max-w-2xl">
+                    <div class="mb-6">
+                        <label class="block ui-heading font-medium mb-2">Default Country Code</label>
+                        <input type="text" id="countryCode" value="91" class="theme-input" placeholder="91">
+                        <p class="text-xs ui-muted mt-1">Auto-added to contact numbers when sending.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block ui-heading font-medium mb-2">Daily Limit per Account</label>
+                        <input type="number" id="dailyLimit" value="50" min="1" max="500" class="theme-input">
+                        <p class="text-xs ui-muted mt-1">Max messages per WhatsApp account per day (resets at midnight).</p>
+                    </div>
+                    <div class="mb-6 grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block ui-heading font-medium mb-2">Min delay (seconds)</label>
+                            <input type="number" id="sendDelayMin" value="3" min="1" max="120" class="theme-input">
+                        </div>
+                        <div>
+                            <label class="block ui-heading font-medium mb-2">Max delay (seconds)</label>
+                            <input type="number" id="sendDelayMax" value="8" min="1" max="300" class="theme-input">
+                        </div>
+                        <p class="text-xs ui-muted col-span-2">Random pause between each contact to reduce ban risk. Higher = safer, slower.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="rotateAccounts" checked class="rounded text-emerald-600 focus:ring-emerald-500">
+                            <span class="ui-heading text-sm">Rotate across all connected WhatsApp accounts</span>
+                        </label>
+                        <p class="text-xs ui-muted mt-2 ml-7">When enabled, contacts are spread across accounts round-robin. When off, only the first account sends.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block ui-heading font-medium mb-2">API Key</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="apiKey" readonly class="theme-input flex-1 opacity-80">
+                            <button id="regenerateApiKey" class="border border-emerald-500 text-emerald-600 dark:text-emerald-400 px-4 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition">Regenerate</button>
+                        </div>
+                    </div>
+                    <button id="saveSettings" class="bg-emerald-600 text-white px-6 py-2 rounded-lg">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Campaign Modal -->
+<div id="campaignModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-4">
+        <h3 class="text-xl font-semibold ui-heading mb-4">Create New Campaign</h3>
+        
+        <div class="mb-4">
+            <label class="theme-label">Campaign Name</label>
+            <input type="text" id="campaignName" class="theme-input" placeholder="Summer Sale 2024">
+        </div>
+        
+        <div class="mb-4">
+            <label class="theme-label">Contact Segment</label>
+            <select id="campaignContactSelect" class="theme-input">
+                <option value="all">All Contacts</option>
+            </select>
+            <p class="text-xs ui-muted mt-1">Send only to contacts with a matching tag, or everyone.</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="theme-label">Message Template</label>
+            <textarea id="campaignMessage" rows="4" class="theme-input" placeholder="Hello {name}, your vehicle {vehicle} has..."></textarea>
+            <div class="text-right text-sm ui-muted mt-1"><span id="charCount">0</span>/160 characters</div>
+            <div class="flex gap-2 mt-2 flex-wrap">
+                <button type="button" onclick="insertVariable('{name}')" class="text-xs theme-chip">+ {name}</button>
+                <button type="button" onclick="insertVariable('{phone}')" class="text-xs theme-chip">+ {phone}</button>
+                <button type="button" onclick="insertVariable('{vehicle}')" class="text-xs theme-chip">+ {vehicle}</button>
+                <button type="button" onclick="insertVariable('{id}')" class="text-xs theme-chip">+ {id}</button>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label class="theme-label">Media Attachments <span class="ui-muted font-normal">(optional, separate messages)</span></label>
+            <input type="file" id="campaignMedia" multiple accept=".jpg,.jpeg,.png,.pdf" class="w-full text-sm ui-muted">
+            <div id="campaignMediaList" class="flex flex-wrap gap-2 mt-2"></div>
+            <p class="text-xs ui-muted mt-1">JPG, PNG, PDF — each sent as its own WhatsApp message</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="theme-label">APK Files <span class="ui-muted font-normal">(optional, sent after media)</span></label>
+            <input type="file" id="campaignApk" multiple accept=".apk" class="w-full text-sm ui-muted">
+            <div id="campaignApkList" class="flex flex-wrap gap-2 mt-2"></div>
+            <p class="text-xs ui-muted mt-1">APK files are sent separately from text and other attachments</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="theme-label">Schedule</label>
+            <select id="campaignSchedule" class="theme-input">
+                <option value="now">Send Now</option>
+                <option value="later">Schedule for later</option>
+            </select>
+        </div>
+        
+        <div id="scheduleTimeDiv" class="mb-4 hidden">
+            <input type="datetime-local" id="scheduleTime" class="theme-input">
+        </div>
+        
+        <div class="flex gap-3 mt-6">
+            <button id="closeCampaignModal" class="flex-1 theme-btn-secondary py-2">Cancel</button>
+            <button id="launchCampaign" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-2 rounded-lg font-medium hover:opacity-90 transition">Launch Campaign</button>
+        </div>
+    </div>
+</div>
+
+<!-- Campaign Progress Modal -->
+<div id="campaignProgressModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-[60] hidden">
+    <div class="modal-panel rounded-2xl p-6 max-w-md w-full mx-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center animate-pulse">
+                <i class="ri-send-plane-fill text-emerald-600 dark:text-emerald-400"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold ui-heading" id="progressCampaignName">Sending campaign...</h3>
+                <p class="text-sm ui-muted" id="progressSubtitle">Starting...</p>
+            </div>
+        </div>
+        <div class="progress-track mb-3">
+            <div class="progress-fill" id="progressBarFill"></div>
+        </div>
+        <div class="flex justify-between text-sm mb-4">
+            <span class="ui-muted" id="progressCount">0 / 0</span>
+            <span class="ui-muted" id="progressPercent">0%</span>
+        </div>
+        <div class="ui-card rounded-lg p-3 text-sm space-y-1">
+            <div><span class="ui-muted">Sending to:</span> <strong id="progressContact" class="ui-heading">—</strong></div>
+            <div><span class="ui-muted">Via WhatsApp:</span> <strong id="progressAccount" class="text-emerald-600 dark:text-emerald-400">—</strong></div>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-4 justify-center">
+            <button id="progressPauseBtn" onclick="pauseActiveCampaign()" class="campaign-ops-btn bg-amber-500 text-white hover:opacity-90">
+                <i class="ri-pause-line"></i> Pause
+            </button>
+            <button id="progressResumeBtn" onclick="resumeActiveCampaign()" class="campaign-ops-btn bg-emerald-600 text-white hover:opacity-90 hidden">
+                <i class="ri-play-line"></i> Resume
+            </button>
+            <button id="progressCancelBtn" onclick="cancelActiveCampaign()" class="campaign-ops-btn border border-red-400 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                <i class="ri-stop-circle-line"></i> Cancel
+            </button>
+            <button id="progressDetailsBtn" onclick="openActiveCampaignDetail()" class="campaign-ops-btn theme-btn-secondary">
+                <i class="ri-list-check-2"></i> Live log
+            </button>
+        </div>
+        <p class="text-xs ui-muted mt-3 text-center">Keep this app open. APK files may take 30–60s each.</p>
+    </div>
+</div>
+
+<!-- Campaign Success Modal -->
+<div id="campaignSuccessModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+        <div class="success-check-ring w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5 ring-4 ring-emerald-50">
+            <i class="ri-check-line text-5xl text-emerald-600 font-bold"></i>
+        </div>
+        <h3 class="text-xl font-bold ui-heading mb-2">Campaign Complete!</h3>
+        <p id="campaignSuccessText" class="ui-muted text-sm mb-6"></p>
+        <button id="closeCampaignSuccess" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white py-2.5 rounded-lg font-semibold">Done</button>
+    </div>
+</div>
+
+<!-- Campaign Failed Modal -->
+<div id="campaignFailedModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+        <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5 ring-4 ring-red-50">
+            <i class="ri-close-line text-5xl text-red-500 font-bold"></i>
+        </div>
+        <h3 class="text-xl font-bold ui-heading mb-2">Campaign Failed</h3>
+        <p id="campaignFailedText" class="ui-muted text-sm mb-6"></p>
+        <button id="closeCampaignFailed" class="w-full theme-btn-secondary py-2.5 font-medium">Close</button>
+    </div>
+</div>
+
+<!-- Campaign Detail Modal -->
+<div id="campaignDetailModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto mx-4">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="text-xl font-semibold ui-heading" id="detailCampaignName">Campaign</h3>
+                <span id="detailCampaignStatus" class="badge badge-pending mt-1">pending</span>
+            </div>
+            <button onclick="closeModal('campaignDetailModal')" class="ui-muted hover:text-red-500 text-xl"><i class="ri-close-line"></i></button>
+        </div>
+        <div id="detailLiveOps" class="hidden mb-4 ui-card rounded-xl p-4 border border-emerald-500/30">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <p class="text-sm font-medium ui-heading">Live campaign ops</p>
+                <span id="detailLiveStatus" class="badge badge-running">running</span>
+            </div>
+            <div class="progress-track mb-2">
+                <div class="progress-fill" id="detailProgressBar"></div>
+            </div>
+            <div class="flex justify-between text-xs ui-muted mb-3">
+                <span id="detailProgressCount">0 / 0</span>
+                <span id="detailProgressPercent">0%</span>
+            </div>
+            <div class="text-sm ui-muted mb-3">
+                <span>Current:</span> <strong id="detailCurrentContact" class="ui-heading">—</strong>
+                <span class="mx-2">·</span>
+                <span>Via:</span> <strong id="detailCurrentAccount" class="text-emerald-600 dark:text-emerald-400">—</strong>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button id="detailPauseBtn" onclick="pauseDetailCampaign()" class="campaign-ops-btn bg-amber-500 text-white hover:opacity-90">
+                    <i class="ri-pause-line"></i> Pause
+                </button>
+                <button id="detailResumeBtn" onclick="resumeDetailCampaign()" class="campaign-ops-btn bg-emerald-600 text-white hover:opacity-90 hidden">
+                    <i class="ri-play-line"></i> Resume
+                </button>
+                <button id="detailCancelBtn" onclick="cancelDetailCampaign()" class="campaign-ops-btn border border-red-400 text-red-500">
+                    <i class="ri-stop-circle-line"></i> Cancel
+                </button>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+            <div class="ui-card rounded-lg p-3"><span class="ui-muted block">Sent</span><strong id="detailSent" class="ui-heading text-lg">0</strong></div>
+            <div class="ui-card rounded-lg p-3"><span class="ui-muted block">Recipients</span><strong id="detailRecipients" class="ui-heading text-lg">0</strong></div>
+        </div>
+        <div id="detailRetryWrap" class="hidden mb-4">
+            <button id="detailRetryFailedBtn" onclick="retryFailedCampaign()" class="campaign-ops-btn bg-emerald-600 text-white hover:opacity-90">
+                <i class="ri-refresh-line"></i> Retry failed contacts only
+            </button>
+        </div>
+        <div class="mb-4">
+            <p class="text-sm font-medium ui-heading mb-2">Message Preview</p>
+            <div class="msg-preview" id="detailMessage">—</div>
+        </div>
+        <div class="mb-4">
+            <p class="text-sm font-medium ui-heading mb-2">Attachments</p>
+            <div id="detailAttachments" class="flex flex-wrap gap-2 text-sm ui-muted">None</div>
+        </div>
+        <div class="mb-4" id="detailSegmentWrap">
+            <p class="text-sm font-medium ui-heading mb-1">Segment</p>
+            <p class="text-sm ui-muted" id="detailSegment">All contacts</p>
+        </div>
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-sm font-medium ui-heading">Delivery Log</p>
+                <span class="text-xs ui-muted" id="detailDeliverySummary">—</span>
+            </div>
+            <div class="ui-card rounded-lg overflow-hidden max-h-56 overflow-y-auto">
+                <table class="delivery-table">
+                    <thead>
+                        <tr>
+                            <th>Contact</th>
+                            <th>Phone</th>
+                            <th>WhatsApp</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailDeliveryBody">
+                        <tr><td colspan="5" class="text-center py-6 ui-muted">No delivery records yet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-xs ui-muted space-y-1 border-t dark:border-slate-700 pt-3">
+            <div>Created: <span id="detailCreated">—</span></div>
+            <div id="detailScheduledWrap" class="hidden">Scheduled: <span id="detailScheduled">—</span></div>
+            <div>Completed: <span id="detailCompleted">—</span></div>
+            <div id="detailErrorWrap" class="hidden text-red-500">Error: <span id="detailError"></span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Contact Modal -->
+<div id="contactModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-semibold ui-heading mb-4">Add Contact</h3>
+        <div class="mb-3">
+            <label class="theme-label">Phone</label>
+            <div class="flex gap-2 items-center">
+                <span id="contactPhonePrefix" class="px-3 py-2 theme-chip font-medium">+91</span>
+                <input type="tel" id="contactPhone" placeholder="9876543210" class="theme-input flex-1">
+            </div>
+        </div>
+        <div class="mb-3">
+            <input type="text" id="contactName" placeholder="Name" class="theme-input">
+        </div>
+        <div class="mb-3">
+            <input type="text" id="contactVehicle" placeholder="Vehicle Number" class="theme-input">
+        </div>
+        <div class="mb-3">
+            <input type="text" id="contactTags" placeholder="Tags (e.g. premium, Mumbai)" class="theme-input">
+            <p class="text-xs ui-muted mt-1">Comma-separated — used for campaign segments</p>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button id="closeContactModal" class="flex-1 theme-btn-secondary py-2">Cancel</button>
+            <button id="saveContact" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:opacity-90">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Template Modal -->
+<div id="templateModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden">
+    <div class="modal-panel rounded-2xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-semibold ui-heading mb-4">Save Template</h3>
+        <div class="mb-3">
+            <input type="text" id="templateName" placeholder="Template Name" class="theme-input">
+        </div>
+        <div class="mb-3">
+            <textarea id="templateContent" rows="4" placeholder="Template content with {name}, {vehicle}, {id}..." class="theme-input"></textarea>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button id="closeTemplateModal" class="flex-1 theme-btn-secondary py-2">Cancel</button>
+            <button id="saveTemplate" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:opacity-90">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global state (loaded from API after login)
+    let currentUser = null;
+    let authToken = localStorage.getItem('authToken') || null;
+    let contacts = [];
+    let whatsappSessions = [];
+    let templates = [];
+    let campaigns = [];
+    let messageStats = { total: 0, daily: {}, messages_this_week: 0, success_rate: 0, completed_campaigns: 0, failed_campaigns: 0 };
+    let chartInstances = { message: null, delivery: null, hours: null };
+    let qrPollInterval = null;
+    let activeLinkSessionId = null;
+    let defaultCountryCode = '91';
+    
+    function updatePhonePrefix() {
+        const prefix = document.getElementById('contactPhonePrefix');
+        if (prefix) prefix.textContent = '+' + defaultCountryCode;
+    }
+    
+    const API_BASE = window.location.origin;
+    
+    // Clear stale demo data from older versions
+    ['contacts', 'whatsappSessions', 'templates', 'campaigns', 'messageStats'].forEach(key => localStorage.removeItem(key));
+    
+    function showAuthError(elementId, message) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.textContent = message;
+        el.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'text-green-700');
+        el.classList.add('bg-red-50', 'border-red-200', 'text-red-600');
+    }
+    
+    function showAuthSuccess(elementId, message) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.textContent = message;
+        el.classList.remove('hidden', 'bg-red-50', 'border-red-200', 'text-red-600');
+        el.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
+    }
+    
+    function clearAuthError(elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.textContent = '';
+        el.classList.add('hidden');
+        el.classList.remove('bg-green-50', 'border-green-200', 'text-green-700', 'bg-red-50', 'border-red-200', 'text-red-600');
+    }
+    
+    function handleAuthExpired(message) {
+        authToken = null;
+        currentUser = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        stopQrPolling();
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+        showAuthError('loginError', message || 'Session expired. Please sign in again.');
+    }
+    
+    async function apiFetch(path, options = {}) {
+        const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+        const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const errMsg = data.error || data.message || data.msg || 'Request failed';
+            if ((response.status === 401 || response.status === 422) && path !== '/api/login' && path !== '/api/register') {
+                handleAuthExpired(errMsg.includes('Signature') || errMsg.includes('Token') || errMsg.includes('expired')
+                    ? 'Session expired. Please sign in again.'
+                    : errMsg);
+            }
+            throw new Error(errMsg);
+        }
+        return data;
+    }
+    
+    function showDashboard(user) {
+        currentUser = user;
+        document.getElementById('userName').innerText = user.company_name || user.name || user.email.split('@')[0];
+        document.getElementById('userEmail').innerText = user.email;
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('signupView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        loadDashboardData();
+    }
+    
+    async function loadDashboardData() {
+        if (!authToken) return;
+        try {
+            const [contactsRes, sessionsRes, templatesRes, campaignsRes, statsRes, settingsRes, analyticsRes] = await Promise.all([
+                apiFetch('/api/contacts'),
+                apiFetch('/api/whatsapp/sessions'),
+                apiFetch('/api/templates'),
+                apiFetch('/api/campaigns'),
+                apiFetch('/api/stats'),
+                apiFetch('/api/settings').catch(() => ({})),
+                apiFetch('/api/analytics').catch(() => null)
+            ]);
+            contacts = contactsRes.contacts || [];
+            whatsappSessions = (sessionsRes.sessions || []).map(s => ({
+                id: s.id,
+                phoneNumber: s.phone_number,
+                status: s.status,
+                messagesToday: s.messages_today,
+                dailyLimit: s.daily_limit,
+                lastActive: s.last_active
+            }));
+            templates = templatesRes.templates || [];
+            campaigns = (campaignsRes.campaigns || []).map(c => ({
+                id: c.id,
+                name: c.name,
+                status: c.status,
+                message: c.message,
+                recipientCount: c.recipient_count,
+                sentCount: c.sent_count,
+                createdAt: c.created_at,
+                progressIndex: c.progress_index || 0,
+                currentContactName: c.current_contact_name,
+                activeWhatsappPhone: c.active_whatsapp_phone
+            }));
+            messageStats.total = statsRes.total_messages || 0;
+            messageStats.messages_this_week = statsRes.messages_this_week || 0;
+            messageStats.success_rate = statsRes.success_rate || 0;
+            messageStats.completed_campaigns = statsRes.completed_campaigns || 0;
+            messageStats.failed_campaigns = statsRes.failed_campaigns || 0;
+            messageStats.total_sessions = statsRes.total_sessions || whatsappSessions.length;
+            messageStats.max_accounts = statsRes.max_accounts || 15;
+            messageStats.recommended_accounts = statsRes.recommended_accounts || 5;
+            if (settingsRes.api_key) document.getElementById('apiKey').value = settingsRes.api_key;
+            if (settingsRes.country_code) {
+                defaultCountryCode = String(settingsRes.country_code).replace(/\D/g, '') || '91';
+                document.getElementById('countryCode').value = defaultCountryCode;
+                updatePhonePrefix();
+            }
+            if (settingsRes.daily_limit) document.getElementById('dailyLimit').value = settingsRes.daily_limit;
+            if (settingsRes.send_delay_min) document.getElementById('sendDelayMin').value = settingsRes.send_delay_min;
+            if (settingsRes.send_delay_max) document.getElementById('sendDelayMax').value = settingsRes.send_delay_max;
+            if (settingsRes.rotate_accounts !== undefined) document.getElementById('rotateAccounts').checked = !!settingsRes.rotate_accounts;
+            if (settingsRes.max_accounts) {
+                document.getElementById('maxAccountsInfo').textContent = settingsRes.max_accounts;
+                document.getElementById('recommendedAccountsInfo').textContent = settingsRes.recommended_accounts || 5;
+            }
+            updateDashboardStats();
+            renderContacts();
+            renderWhatsAppAccounts();
+            renderTemplates();
+            renderCampaigns();
+            if (analyticsRes) updateCharts(analyticsRes);
+        } catch (err) {
+            console.error('Failed to load dashboard data:', err);
+        }
+    }
+    
+    function stopQrPolling() {
+        if (qrPollInterval) {
+            clearInterval(qrPollInterval);
+            qrPollInterval = null;
+        }
+        activeLinkSessionId = null;
+    }
+    
+    function renderQrImage(qrCode) {
+        const qrContainer = document.getElementById('qrCanvas');
+        if (qrCode) {
+            qrContainer.innerHTML = `<img src="${qrCode}" class="w-64 h-64" alt="WhatsApp QR Code">`;
+        } else {
+            qrContainer.innerHTML = '<span class="ui-muted text-sm text-center px-4">Waiting for QR code...</span>';
+        }
+    }
+    
+    async function pollLinkStatus() {
+        if (!activeLinkSessionId) return;
+        try {
+            const data = await apiFetch(`/api/whatsapp/sessions/${activeLinkSessionId}/status`);
+            const qrStatus = document.getElementById('qrStatus');
+            
+            if (data.qr_code) {
+                renderQrImage(data.qr_code);
+            }
+            
+            if (data.status === 'connected') {
+                qrStatus.textContent = `Connected as ${data.phone_number || 'WhatsApp account'}`;
+                stopQrPolling();
+                setTimeout(async () => {
+                    closeModal('qrModal');
+                    await loadDashboardData();
+                }, 800);
+                return;
+            }
+            
+            if (data.error) {
+                qrStatus.textContent = `Error: ${data.error}. Close and try again.`;
+                return;
+            }
+            
+            if (data.status === 'pending') {
+                qrStatus.textContent = 'Scan this QR with WhatsApp on your phone (Linked Devices → Link a Device).';
+            } else {
+                qrStatus.textContent = `Status: ${data.bridge_status || data.status}`;
+            }
+        } catch (err) {
+            document.getElementById('qrStatus').textContent = err.message || 'Could not check link status';
+        }
+    }
+    
+    async function openWhatsAppQrModal(sessionId = null) {
+        const qrStatus = document.getElementById('qrStatus');
+        renderQrImage(null);
+        qrStatus.textContent = 'Starting WhatsApp Web session...';
+        openModal('qrModal');
+        stopQrPolling();
+        
+        try {
+            let data;
+            if (sessionId) {
+                data = await apiFetch(`/api/whatsapp/sessions/${sessionId}/reconnect`, { method: 'POST' });
+            } else {
+                data = await apiFetch('/api/whatsapp/link', { method: 'POST' });
+            }
+            
+            activeLinkSessionId = data.session_id;
+            if (data.qr_code) {
+                renderQrImage(data.qr_code);
+            }
+            
+            if (data.status === 'connected') {
+                qrStatus.textContent = `Already connected as ${data.phone_number || 'WhatsApp account'}`;
+                stopQrPolling();
+                closeModal('qrModal');
+                await loadDashboardData();
+                return;
+            }
+            
+            qrStatus.textContent = 'Scan this QR with WhatsApp on your phone (Linked Devices → Link a Device).';
+            qrPollInterval = setInterval(pollLinkStatus, 2000);
+            pollLinkStatus();
+        } catch (err) {
+            renderQrImage(null);
+            qrStatus.textContent = err.message || 'Could not start WhatsApp linking';
+        }
+    }
+    
+    // Helper functions
+    function updateDashboardStats() {
+        document.getElementById('totalMessages').innerText = messageStats.total || 0;
+        document.getElementById('activeAccounts').innerText = whatsappSessions.filter(s => s.status === 'connected').length;
+        document.getElementById('totalContacts').innerText = contacts.length;
+        document.getElementById('totalAccountsLabel').textContent =
+            `of ${messageStats.total_sessions || whatsappSessions.length} total (max ${messageStats.max_accounts || 15})`;
+        document.getElementById('messagesWeekStat').textContent = `${messageStats.messages_this_week || 0} sent this week`;
+        document.getElementById('successRate').innerText = messageStats.success_rate || 0;
+        document.getElementById('campaignsFinishedStat').textContent =
+            `${(messageStats.completed_campaigns || 0) + (messageStats.failed_campaigns || 0)} campaigns finished`;
+    }
+
+    function chartColors() {
+        const dark = document.documentElement.classList.contains('dark');
+        return {
+            text: dark ? '#94a3b8' : '#64748b',
+            grid: dark ? '#2d3a4f' : '#e2e8f0',
+            primary: dark ? '#34d399' : '#075e54',
+            primaryFill: dark ? 'rgba(52, 211, 153, 0.12)' : 'rgba(7, 94, 84, 0.08)',
+            secondary: '#25d366',
+            danger: '#f87171',
+            muted: dark ? '#475569' : '#cbd5e1',
+            blue: '#60a5fa'
+        };
+    }
+
+    function updateCharts(analytics) {
+        const c = chartColors();
+        const chartDefaults = {
+            plugins: { legend: { labels: { color: c.text } } },
+            scales: {
+                x: { ticks: { color: c.text }, grid: { color: c.grid } },
+                y: { ticks: { color: c.text }, grid: { color: c.grid } }
+            }
+        };
+
+        const msgCtx = document.getElementById('messageChart')?.getContext('2d');
+        if (msgCtx) {
+            if (chartInstances.message) chartInstances.message.destroy();
+            chartInstances.message = new Chart(msgCtx, {
+                type: 'line',
+                data: {
+                    labels: analytics.daily_labels || [],
+                    datasets: [{ label: 'Messages sent', data: analytics.daily_counts || [], borderColor: c.primary, backgroundColor: c.primaryFill, fill: true, tension: 0.35, pointBackgroundColor: c.primary }]
+                },
+                options: chartDefaults
+            });
+        }
+
+        const deliveryCtx = document.getElementById('deliveryChart')?.getContext('2d');
+        if (deliveryCtx) {
+            if (chartInstances.delivery) chartInstances.delivery.destroy();
+            const cs = analytics.campaign_status || {};
+            chartInstances.delivery = new Chart(deliveryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Failed', 'Running', 'Pending'],
+                    datasets: [{ data: [cs.completed || 0, cs.failed || 0, cs.running || 0, cs.pending || 0], backgroundColor: [c.primary, c.danger, c.blue, c.muted], borderWidth: 0 }]
+                },
+                options: { plugins: { legend: { labels: { color: c.text } } } }
+            });
+        }
+
+        const hoursCtx = document.getElementById('hoursChart')?.getContext('2d');
+        if (hoursCtx) {
+            if (chartInstances.hours) chartInstances.hours.destroy();
+            chartInstances.hours = new Chart(hoursCtx, {
+                type: 'bar',
+                data: {
+                    labels: analytics.hour_labels || [],
+                    datasets: [{ label: 'Messages', data: analytics.hour_counts || [], backgroundColor: c.primary }]
+                },
+                options: chartDefaults
+            });
+        }
+    }
+
+    let activeCampaignId = null;
+    let detailCampaignId = null;
+
+    function campaignProgressPercent(data) {
+        const total = data.recipient_count || 0;
+        const idx = data.progress_index || 0;
+        const current = Math.min(idx, total);
+        return total > 0 ? Math.round((current / total) * 100) : 0;
+    }
+
+    function updateDetailLiveOps(data) {
+        const liveOps = document.getElementById('detailLiveOps');
+        const isActive = ['running', 'paused'].includes(data.status);
+        liveOps.classList.toggle('hidden', !isActive);
+
+        if (!isActive) return;
+
+        const pct = campaignProgressPercent(data);
+        document.getElementById('detailLiveStatus').textContent = data.status;
+        document.getElementById('detailLiveStatus').className = `badge badge-${data.status}`;
+        document.getElementById('detailProgressBar').style.width = `${pct}%`;
+        document.getElementById('detailProgressCount').textContent = `${Math.min(data.progress_index || 0, data.recipient_count || 0)} / ${data.recipient_count || 0}`;
+        document.getElementById('detailProgressPercent').textContent = `${pct}%`;
+        document.getElementById('detailCurrentContact').textContent = data.current_contact_name
+            ? `${data.current_contact_name}${data.current_contact_phone ? ' (' + data.current_contact_phone + ')' : ''}`
+            : '—';
+        document.getElementById('detailCurrentAccount').textContent = data.active_whatsapp_phone || '—';
+
+        document.getElementById('detailPauseBtn').classList.toggle('hidden', data.status !== 'running');
+        document.getElementById('detailResumeBtn').classList.toggle('hidden', data.status !== 'paused');
+        document.getElementById('detailCancelBtn').classList.toggle('hidden', !isActive);
+    }
+
+    function updateProgressControls(data) {
+        document.getElementById('progressPauseBtn').classList.toggle('hidden', data.status !== 'running');
+        document.getElementById('progressResumeBtn').classList.toggle('hidden', data.status !== 'paused');
+    }
+
+    async function openCampaignDetail(id) {
+        stopDetailPoll();
+        detailCampaignId = id;
+        try {
+            const [data, deliveryData] = await Promise.all([
+                apiFetch(`/api/campaigns/${id}`),
+                apiFetch(`/api/campaigns/${id}/deliveries`)
+            ]);
+            document.getElementById('detailCampaignName').textContent = data.name || 'Campaign';
+            const statusEl = document.getElementById('detailCampaignStatus');
+            statusEl.textContent = data.status;
+            statusEl.className = `badge badge-${data.status} mt-1`;
+            document.getElementById('detailSent').textContent = data.sent_count || 0;
+            document.getElementById('detailRecipients').textContent = data.recipient_count || 0;
+            document.getElementById('detailMessage').textContent = data.message || '(no text — attachments only)';
+            document.getElementById('detailSegment').textContent = formatSegmentLabel(data.contact_filter);
+            const attachEl = document.getElementById('detailAttachments');
+            const attachments = data.attachments || [];
+            if (!attachments.length) {
+                attachEl.innerHTML = '<span class="ui-muted">None</span>';
+            } else {
+                attachEl.innerHTML = attachments.map(a => {
+                    const name = a.filename || 'file';
+                    const isApk = name.toLowerCase().endsWith('.apk');
+                    return `<span class="file-chip"><i class="ri-${isApk ? 'android' : 'attachment-2'}-line"></i>${name}</span>`;
+                }).join('');
+            }
+            renderDeliveryLog(deliveryData.deliveries || [], data.sent_count, data.recipient_count);
+            updateDetailLiveOps(data);
+            document.getElementById('detailCreated').textContent = data.created_at ? new Date(data.created_at).toLocaleString() : '—';
+            const schedWrap = document.getElementById('detailScheduledWrap');
+            if (data.scheduled_for) {
+                schedWrap.classList.remove('hidden');
+                document.getElementById('detailScheduled').textContent = new Date(data.scheduled_for).toLocaleString();
+            } else {
+                schedWrap.classList.add('hidden');
+            }
+            document.getElementById('detailCompleted').textContent = data.completed_at ? new Date(data.completed_at).toLocaleString() : '—';
+            const errWrap = document.getElementById('detailErrorWrap');
+            if (data.error_message) {
+                errWrap.classList.remove('hidden');
+                document.getElementById('detailError').textContent = data.error_message;
+            } else {
+                errWrap.classList.add('hidden');
+            }
+            openModal('campaignDetailModal');
+
+            if (['running', 'paused'].includes(data.status)) {
+                detailPollTimer = setInterval(async () => {
+                    try {
+                        const modal = document.getElementById('campaignDetailModal');
+                        if (modal.classList.contains('hidden')) {
+                            stopDetailPoll();
+                            return;
+                        }
+                        const [fresh, freshDel] = await Promise.all([
+                            apiFetch(`/api/campaigns/${id}`),
+                            apiFetch(`/api/campaigns/${id}/deliveries`)
+                        ]);
+                        document.getElementById('detailSent').textContent = fresh.sent_count || 0;
+                        statusEl.textContent = fresh.status;
+                        statusEl.className = `badge badge-${fresh.status} mt-1`;
+                        renderDeliveryLog(freshDel.deliveries || [], fresh.sent_count, fresh.recipient_count);
+                        updateDetailLiveOps(fresh);
+                        if (!['running', 'paused'].includes(fresh.status)) {
+                            stopDetailPoll();
+                            await loadDashboardData();
+                        }
+                    } catch (_) {}
+                }, 2000);
+            }
+        } catch (err) {
+            alert(err.message || 'Could not load campaign details');
+        }
+    }
+    
+    function renderContacts() {
+        const tbody = document.getElementById('contactsTableBody');
+        if (contacts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 ui-muted">No contacts. Import CSV or add manually.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = contacts.map((contact) => `
+            <tr class="border-b ui-row" style="border-color: var(--border)">
+                <td class="px-6 py-3 ui-heading">${contact.phone}</td>
+                <td class="px-6 py-3">${contact.name || '-'}</td>
+                <td class="px-6 py-3">${contact.vehicle || '-'}</td>
+                <td class="px-6 py-3"><span class="theme-chip">${contact.tags || 'general'}</span></td>
+                <td class="px-6 py-3 text-sm ui-muted">${contact.created_at ? new Date(contact.created_at).toLocaleDateString() : (contact.createdAt || '-')}</td>
+                <td class="px-6 py-3"><button onclick="deleteContact(${contact.id})" class="text-red-500 hover:text-red-400"><i class="ri-delete-bin-line"></i></button></td>
+            </tr>
+        `).join('');
+    }
+    
+    async function deleteContact(id) {
+        try {
+            await apiFetch(`/api/contacts/${id}`, { method: 'DELETE' });
+            await loadDashboardData();
+        } catch (err) {
+            alert(err.message || 'Could not delete contact');
+        }
+    }
+    
+    function renderWhatsAppAccounts() {
+        const container = document.getElementById('whatsappAccountsList');
+        if (whatsappSessions.length === 0) {
+            container.innerHTML = '<div class="text-center ui-muted py-8 col-span-3">No WhatsApp accounts connected. Click "Add Account" to start.</div>';
+            return;
+        }
+        
+        container.innerHTML = whatsappSessions.map((session) => `
+            <div class="ui-card rounded-xl p-4 card-hover ${session.status === 'connected' ? 'border-l-4 border-l-emerald-500' : ''}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full ${session.status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}"></div>
+                        <span class="font-medium ui-heading">${session.phoneNumber || 'Pending link'}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="wa-refresh-${session.id}" onclick="refreshWhatsAppAccount(${session.id})" class="text-emerald-500 text-sm hover:text-emerald-400" title="Check if still connected">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                        <button onclick="removeWhatsAppAccount(${session.id})" class="text-red-500 text-sm hover:text-red-400" title="Remove account">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-sm ui-muted space-y-1">
+                    <div>Status: <span class="${session.status === 'connected' ? 'text-emerald-500' : 'ui-muted'}">${session.status || 'disconnected'}</span></div>
+                    <div>Messages today: ${session.messagesToday || 0}/${session.dailyLimit || 50}</div>
+                    <div>Last active: ${session.lastActive ? new Date(session.lastActive).toLocaleString() : 'Never'}</div>
+                </div>
+                ${session.status !== 'connected' ? `<button onclick="reconnectWhatsApp(${session.id})" class="mt-3 w-full text-sm theme-btn-secondary py-1.5">Reconnect</button>` : ''}
+            </div>
+        `).join('');
+    }
+    
+    const refreshingWhatsApp = new Set();
+
+    async function refreshWhatsAppAccount(id) {
+        if (refreshingWhatsApp.has(id)) return;
+
+        const session = whatsappSessions.find((s) => s.id === id);
+        const prevStatus = session?.status;
+        refreshingWhatsApp.add(id);
+        const icon = document.querySelector(`#wa-refresh-${id} i`);
+        if (icon) icon.classList.add('animate-spin');
+
+        try {
+            const data = await apiFetch(`/api/whatsapp/sessions/${id}/status`);
+            const idx = whatsappSessions.findIndex((s) => s.id === id);
+            if (idx !== -1) {
+                whatsappSessions[idx] = {
+                    ...whatsappSessions[idx],
+                    phoneNumber: data.phone_number || whatsappSessions[idx].phoneNumber,
+                    status: data.status,
+                    lastActive: new Date().toISOString()
+                };
+            }
+            renderWhatsAppAccounts();
+            updateDashboardStats();
+
+            const phone = data.phone_number || session?.phoneNumber || 'WhatsApp account';
+            if (prevStatus === 'connected' && data.status !== 'connected') {
+                alert(`${phone} is no longer connected. Tap Reconnect to link it again.`);
+            } else if (data.status === 'connected') {
+                console.log(`${phone} is still connected.`);
+            }
+        } catch (err) {
+            alert(err.message || 'Could not check WhatsApp status. Is the bridge running?');
+        } finally {
+            refreshingWhatsApp.delete(id);
+        }
+    }
+
+    async function removeWhatsAppAccount(id) {
+        if (!confirm('Remove this WhatsApp account?')) return;
+        try {
+            await apiFetch(`/api/whatsapp/sessions/${id}`, { method: 'DELETE' });
+            await loadDashboardData();
+        } catch (err) {
+            alert(err.message || 'Could not remove account');
+        }
+    }
+    
+    function renderTemplates() {
+        const container = document.getElementById('templatesList');
+        if (templates.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-500 py-8 col-span-3">No templates. Create your first template.</div>';
+            return;
+        }
+        
+        container.innerHTML = templates.map((template, idx) => `
+            <div class="ui-card rounded-xl p-4 card-hover">
+                <h3 class="font-semibold ui-heading mb-2">${template.name}</h3>
+                <p class="text-sm ui-muted line-clamp-3">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
+                <div class="flex gap-2 mt-3">
+                    <button onclick="useTemplate(${idx})" class="text-sm text-emerald-600 dark:text-emerald-400">Use</button>
+                    <button onclick="deleteTemplate(${template.id})" class="text-sm text-red-500 hover:text-red-400">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function useTemplate(index) {
+        const template = templates[index];
+        document.getElementById('campaignMessage').value = template.content;
+        updateCharCount();
+        closeModal('templateModal');
+        populateCampaignSegments();
+        openModal('campaignModal');
+    }
+    
+    async function deleteTemplate(id) {
+        try {
+            await apiFetch(`/api/templates/${id}`, { method: 'DELETE' });
+            await loadDashboardData();
+        } catch (err) {
+            alert(err.message || 'Could not delete template');
+        }
+    }
+    
+    function renderCampaignProgressCell(campaign) {
+        if (!['running', 'paused'].includes(campaign.status)) {
+            return '<span class="ui-muted text-sm">—</span>';
+        }
+        const total = campaign.recipientCount || 0;
+        const idx = campaign.progressIndex || 0;
+        const pct = total > 0 ? Math.round((Math.min(idx, total) / total) * 100) : 0;
+        return `<div class="min-w-[120px]">
+            <div class="progress-track h-2 mb-1"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <span class="text-xs ui-muted">${Math.min(idx, total)} / ${total}</span>
+        </div>`;
+    }
+
+    function renderCampaigns() {
+        const tbody = document.getElementById('campaignsTableBody');
+        if (campaigns.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">No campaigns yet</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = campaigns.map((campaign) => `
+            <tr class="border-b dark:border-slate-700 ui-row campaign-row" onclick="openCampaignDetail(${campaign.id})">
+                <td class="px-6 py-3">
+                    <div class="flex items-center gap-2">
+                        ${campaign.status === 'completed' ? '<span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0"><i class="ri-check-line text-emerald-600 text-sm"></i></span>' : ''}
+                        ${campaign.status === 'running' ? '<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse flex-shrink-0"></span>' : ''}
+                        ${campaign.status === 'paused' ? '<span class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>' : ''}
+                        <span class="ui-heading">${campaign.name}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-3"><span class="badge badge-${campaign.status}">${campaign.status}</span></td>
+                <td class="px-6 py-3">${campaign.recipientCount || 0}</td>
+                <td class="px-6 py-3">${campaign.sentCount || 0}</td>
+                <td class="px-6 py-3">${renderCampaignProgressCell(campaign)}</td>
+                <td class="px-6 py-3 text-sm ui-muted">${new Date(campaign.createdAt).toLocaleDateString()}</td>
+                <td class="px-6 py-3" onclick="event.stopPropagation()"><button onclick="deleteCampaign(${campaign.id})" class="text-red-500"><i class="ri-delete-bin-line"></i></button></td>
+            </tr>
+        `).join('');
+        
+        // Update recent campaigns on dashboard
+        const recentContainer = document.getElementById('recentCampaigns');
+        if (campaigns.length === 0) {
+            recentContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No campaigns yet. Create your first campaign!</div>';
+        } else {
+            recentContainer.innerHTML = campaigns.slice(0, 5).map(c => `
+                <div class="flex justify-between items-center cursor-pointer hover:opacity-80 py-1 rounded-lg transition" onclick="openCampaignDetail(${c.id})">
+                    <div class="flex items-center gap-2">
+                        ${c.status === 'completed' ? '<span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center"><i class="ri-check-line text-emerald-600 dark:text-emerald-400 text-xs"></i></span>' : ''}
+                        <div>
+                            <p class="font-medium ui-heading">${c.name}</p>
+                            <p class="text-xs ui-muted">${new Date(c.createdAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <span class="text-sm ${c.status === 'completed' ? 'text-emerald-500' : c.status === 'failed' ? 'text-red-400' : 'text-blue-400'}">${c.status}</span>
+                </div>
+            `).join('');
+        }
+    }
+    
+    async function deleteCampaign(id) {
+        try {
+            await apiFetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+            await loadDashboardData();
+        } catch (err) {
+            alert(err.message || 'Could not delete campaign');
+        }
+    }
+    
+    function renderFileChips(inputId, listId) {
+        const input = document.getElementById(inputId);
+        const list = document.getElementById(listId);
+        if (!input || !list) return;
+        list.innerHTML = Array.from(input.files).map(f =>
+            `<span class="file-chip"><i class="ri-attachment-2"></i>${f.name}</span>`
+        ).join('');
+    }
+    
+    function showCampaignSuccess(name, sent, total) {
+        const title = document.querySelector('#campaignSuccessModal h3');
+        if (title) title.textContent = 'Campaign Complete!';
+        document.getElementById('campaignSuccessText').textContent =
+            `"${name}" was delivered to ${sent} of ${total} contact(s). Message and files were sent separately.`;
+        openModal('campaignSuccessModal');
+    }
+    
+    function showCampaignFailed(name, sent, total, reason) {
+        document.getElementById('campaignFailedText').textContent =
+            `"${name}" — sent ${sent}/${total}.${reason ? ' ' + reason : ''}`;
+        openModal('campaignFailedModal');
+    }
+
+    function showCampaignScheduled(name, scheduledFor, total) {
+        const when = scheduledFor ? new Date(scheduledFor).toLocaleString() : 'the scheduled time';
+        document.getElementById('campaignSuccessText').textContent =
+            `"${name}" is scheduled for ${when}. It will send to ${total} contact(s) automatically — you can close the app.`;
+        const title = document.querySelector('#campaignSuccessModal h3');
+        if (title) title.textContent = 'Campaign Scheduled!';
+        openModal('campaignSuccessModal');
+    }
+
+    function formatSegmentLabel(filter) {
+        if (!filter || filter.type === 'all') return 'All contacts';
+        return `Tag: ${filter.tag || '—'}`;
+    }
+
+    function getContactFilterFromSelect() {
+        const val = document.getElementById('campaignContactSelect')?.value || 'all';
+        if (val === 'all') return { type: 'all', tag: null };
+        return { type: 'tag', tag: val };
+    }
+
+    async function populateCampaignSegments() {
+        const select = document.getElementById('campaignContactSelect');
+        if (!select) return;
+        const prev = select.value;
+        select.innerHTML = '<option value="all">All Contacts</option>';
+        try {
+            const data = await apiFetch('/api/contacts/tags');
+            (data.tags || []).forEach(tag => {
+                const opt = document.createElement('option');
+                opt.value = tag;
+                opt.textContent = `Tag: ${tag}`;
+                select.appendChild(opt);
+            });
+            if (prev && [...select.options].some(o => o.value === prev)) {
+                select.value = prev;
+            }
+        } catch (_) {}
+    }
+
+    function showProgressModal(name) {
+        document.getElementById('progressCampaignName').textContent = name || 'Sending campaign...';
+        document.getElementById('progressSubtitle').textContent = 'Starting...';
+        document.getElementById('progressBarFill').style.width = '0%';
+        document.getElementById('progressCount').textContent = '0 / 0';
+        document.getElementById('progressPercent').textContent = '0%';
+        document.getElementById('progressContact').textContent = '—';
+        document.getElementById('progressAccount').textContent = '—';
+        openModal('campaignProgressModal');
+    }
+
+    function hideProgressModal() {
+        closeModal('campaignProgressModal');
+    }
+
+    function updateProgressUI(data, name) {
+        const total = data.recipient_count || 0;
+        const idx = data.progress_index || 0;
+        const current = Math.min(idx, total);
+        const pct = campaignProgressPercent(data);
+
+        document.getElementById('progressCampaignName').textContent = name || data.name || 'Sending...';
+        document.getElementById('progressSubtitle').textContent =
+            data.status === 'running' ? 'Sending messages...'
+            : data.status === 'paused' ? 'Paused — click Resume to continue'
+            : data.status;
+        document.getElementById('progressBarFill').style.width = `${pct}%`;
+        document.getElementById('progressCount').textContent = `${current} / ${total} (${data.sent_count || 0} sent)`;
+        document.getElementById('progressPercent').textContent = `${pct}%`;
+
+        const contactLabel = data.current_contact_name
+            ? `${data.current_contact_name}${data.current_contact_phone ? ' (' + data.current_contact_phone + ')' : ''}`
+            : (data.status === 'running' ? 'Preparing...' : '—');
+        document.getElementById('progressContact').textContent = contactLabel;
+        document.getElementById('progressAccount').textContent = data.active_whatsapp_phone || '—';
+        updateProgressControls(data);
+    }
+
+    function renderDeliveryLog(deliveries, sentCount, recipientCount) {
+        const tbody = document.getElementById('detailDeliveryBody');
+        const summary = document.getElementById('detailDeliverySummary');
+        const ok = deliveries.filter(d => d.status === 'sent').length;
+        const fail = deliveries.filter(d => d.status === 'failed').length;
+        const skipped = deliveries.filter(d => d.status === 'skipped').length;
+        summary.textContent = `${ok} sent · ${fail} failed · ${skipped} skipped · ${deliveries.length} logged`;
+
+        const retryWrap = document.getElementById('detailRetryWrap');
+        if (retryWrap && !['running', 'paused'].includes(document.getElementById('detailCampaignStatus')?.textContent)) {
+            retryWrap.classList.toggle('hidden', fail === 0);
+        }
+
+        if (!deliveries.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 ui-muted">No delivery records yet</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = deliveries.map(d => {
+            const badgeClass = d.status === 'sent' ? 'badge-completed' : d.status === 'skipped' ? 'badge-skipped' : 'badge-failed';
+            const time = d.sent_at ? new Date(d.sent_at).toLocaleString() : '—';
+            const errHint = d.error_message ? ` title="${d.error_message.replace(/"/g, '&quot;')}"` : '';
+            return `<tr class="ui-row">
+                <td>${d.contact_name || '—'}</td>
+                <td>${d.contact_phone || '—'}</td>
+                <td>${d.whatsapp_phone || '—'}</td>
+                <td><span class="badge ${badgeClass}"${errHint}>${d.status}${d.error_message ? ' ⓘ' : ''}</span></td>
+                <td class="whitespace-nowrap">${time}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    let detailPollTimer = null;
+    let activeProgressPoll = null;
+    let activeCampaignName = '';
+
+    function stopDetailPoll() {
+        if (detailPollTimer) {
+            clearInterval(detailPollTimer);
+            detailPollTimer = null;
+        }
+    }
+
+    async function pauseActiveCampaign() {
+        if (!activeCampaignId) return;
+        try {
+            await apiFetch(`/api/campaigns/${activeCampaignId}/pause`, { method: 'POST' });
+            const data = await apiFetch(`/api/campaigns/${activeCampaignId}`);
+            updateProgressUI(data, activeCampaignName);
+        } catch (err) {
+            alert(err.message || 'Could not pause campaign');
+        }
+    }
+
+    async function resumeActiveCampaign() {
+        if (!activeCampaignId) return;
+        try {
+            await apiFetch(`/api/campaigns/${activeCampaignId}/resume`, { method: 'POST' });
+            pollCampaignUntilDone(activeCampaignId, activeCampaignName);
+        } catch (err) {
+            alert(err.message || 'Could not resume campaign');
+        }
+    }
+
+    async function cancelActiveCampaign() {
+        if (!activeCampaignId) return;
+        if (!confirm('Cancel this campaign? Unsent contacts will not receive messages.')) return;
+        try {
+            await apiFetch(`/api/campaigns/${activeCampaignId}/cancel`, { method: 'POST' });
+        } catch (err) {
+            alert(err.message || 'Could not cancel campaign');
+        }
+    }
+
+    function openActiveCampaignDetail() {
+        if (activeCampaignId) openCampaignDetail(activeCampaignId);
+    }
+
+    async function pauseDetailCampaign() {
+        if (!detailCampaignId) return;
+        try {
+            await apiFetch(`/api/campaigns/${detailCampaignId}/pause`, { method: 'POST' });
+            const [fresh, freshDel] = await Promise.all([
+                apiFetch(`/api/campaigns/${detailCampaignId}`),
+                apiFetch(`/api/campaigns/${detailCampaignId}/deliveries`)
+            ]);
+            document.getElementById('detailCampaignStatus').textContent = fresh.status;
+            document.getElementById('detailCampaignStatus').className = `badge badge-${fresh.status} mt-1`;
+            renderDeliveryLog(freshDel.deliveries || [], fresh.sent_count, fresh.recipient_count);
+            updateDetailLiveOps(fresh);
+        } catch (err) {
+            alert(err.message || 'Could not pause campaign');
+        }
+    }
+
+    async function resumeDetailCampaign() {
+        if (!detailCampaignId) return;
+        try {
+            await apiFetch(`/api/campaigns/${detailCampaignId}/resume`, { method: 'POST' });
+            await openCampaignDetail(detailCampaignId);
+        } catch (err) {
+            alert(err.message || 'Could not resume campaign');
+        }
+    }
+
+    async function cancelDetailCampaign() {
+        if (!detailCampaignId) return;
+        if (!confirm('Cancel this campaign? Unsent contacts will not receive messages.')) return;
+        try {
+            await apiFetch(`/api/campaigns/${detailCampaignId}/cancel`, { method: 'POST' });
+        } catch (err) {
+            alert(err.message || 'Could not cancel campaign');
+        }
+    }
+
+    async function retryFailedCampaign() {
+        const id = detailCampaignId || activeCampaignId;
+        if (!id) return;
+        try {
+            await apiFetch(`/api/campaigns/${id}/retry-failed`, { method: 'POST' });
+            closeModal('campaignDetailModal');
+            const campaign = campaigns.find(c => c.id === id);
+            pollCampaignUntilDone(id, campaign?.name || 'Campaign');
+        } catch (err) {
+            alert(err.message || 'Could not retry failed contacts');
+        }
+    }
+    
+    async function uploadCampaignFiles(files) {
+        const attachments = [];
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const uploadRes = await fetch(`${API_BASE}/api/campaigns/upload`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${authToken}` },
+                body: formData
+            });
+            const uploadData = await uploadRes.json().catch(() => ({}));
+            if (!uploadRes.ok) throw new Error(uploadData.error || `Failed to upload ${file.name}`);
+            attachments.push({
+                path: uploadData.attachment_path,
+                filename: uploadData.filename || file.name
+            });
+        }
+        return attachments;
+    }
+    
+    function insertVariable(varText) {
+        const textarea = document.getElementById('campaignMessage');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        textarea.value = text.substring(0, start) + varText + text.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + varText.length;
+        updateCharCount();
+    }
+    
+    function updateCharCount() {
+        const message = document.getElementById('campaignMessage').value;
+        const count = message.length;
+        document.getElementById('charCount').innerText = count;
+        if (count > 160) {
+            document.getElementById('charCount').classList.add('text-red-500');
+        } else {
+            document.getElementById('charCount').classList.remove('text-red-500');
+        }
+    }
+    
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+        if (modalId === 'campaignDetailModal' && typeof stopDetailPoll === 'function') {
+            stopDetailPoll();
+        }
+    }
+    
+    // Page navigation
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.dataset.page;
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+        });
+    });
+    
+    // Login/Signup toggle
+    document.getElementById('showSignup')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('signupView').classList.remove('hidden');
+    });
+    
+    document.getElementById('showLogin')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('signupView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+    });
+    
+    // Login handler
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAuthError('loginError');
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        
+        if (!email || !password) return;
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+        
+        try {
+            const data = await apiFetch('/api/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+            authToken = data.access_token;
+            localStorage.setItem('authToken', authToken);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            showDashboard(data.user);
+        } catch (err) {
+            showAuthError('loginError', err.message || 'Invalid email or password');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+        }
+    });
+    
+    // Signup handler
+    document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAuthError('signupError');
+        const company_name = document.getElementById('signupCompany').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const country_code = document.getElementById('signupCountryCode').value.trim() || '91';
+        const password = document.getElementById('signupPassword').value;
+        const submitBtn = document.getElementById('signupSubmitBtn');
+        
+        if (!email || !password) return;
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+        
+        try {
+            await apiFetch('/api/register', {
+                method: 'POST',
+                body: JSON.stringify({ email, password, company_name, phone, country_code })
+            });
+            document.getElementById('signupForm').reset();
+            document.getElementById('signupView').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('email').value = email;
+            showAuthSuccess('loginError', 'Account created! Please sign in with your password.');
+        } catch (err) {
+            showAuthError('signupError', err.message || 'Could not create account');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+        }
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        currentUser = null;
+        authToken = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('password').value = '';
+        clearAuthError('loginError');
+    });
+    
+    // New Campaign
+    document.getElementById('newCampaignBtn')?.addEventListener('click', async () => {
+        document.getElementById('campaignName').value = '';
+        document.getElementById('campaignMessage').value = '';
+        document.getElementById('campaignMedia').value = '';
+        document.getElementById('campaignApk').value = '';
+        document.getElementById('campaignMediaList').innerHTML = '';
+        document.getElementById('campaignApkList').innerHTML = '';
+        document.getElementById('campaignSchedule').value = 'now';
+        document.getElementById('scheduleTimeDiv').classList.add('hidden');
+        updateCharCount();
+        await populateCampaignSegments();
+        openModal('campaignModal');
+    });
+    
+    document.getElementById('campaignMedia')?.addEventListener('change', () => renderFileChips('campaignMedia', 'campaignMediaList'));
+    document.getElementById('campaignApk')?.addEventListener('change', () => renderFileChips('campaignApk', 'campaignApkList'));
+    document.getElementById('closeCampaignSuccess')?.addEventListener('click', () => closeModal('campaignSuccessModal'));
+    document.getElementById('closeCampaignFailed')?.addEventListener('click', () => closeModal('campaignFailedModal'));
+    
+    document.getElementById('closeCampaignModal')?.addEventListener('click', () => closeModal('campaignModal'));
+    
+    document.getElementById('campaignSchedule')?.addEventListener('change', (e) => {
+        const scheduleTimeDiv = document.getElementById('scheduleTimeDiv');
+        if (e.target.value === 'later') {
+            scheduleTimeDiv.classList.remove('hidden');
+        } else {
+            scheduleTimeDiv.classList.add('hidden');
+        }
+    });
+    
+    document.getElementById('launchCampaign')?.addEventListener('click', async () => {
+        const name = document.getElementById('campaignName').value.trim();
+        const message = document.getElementById('campaignMessage').value.trim();
+        const launchBtn = document.getElementById('launchCampaign');
+        
+        const mediaFiles = Array.from(document.getElementById('campaignMedia').files);
+        const apkFiles = Array.from(document.getElementById('campaignApk').files);
+        
+        if (!name) {
+            alert('Please enter a campaign name');
+            return;
+        }
+        if (!message && mediaFiles.length === 0 && apkFiles.length === 0) {
+            alert('Add a message or at least one attachment');
+            return;
+        }
+        
+        const scheduledFor = document.getElementById('campaignSchedule').value === 'later'
+            ? document.getElementById('scheduleTime').value
+            : null;
+        
+        launchBtn.disabled = true;
+        launchBtn.textContent = 'Launching...';
+        
+        try {
+            let attachmentPaths = [];
+            const allFiles = [...mediaFiles, ...apkFiles];
+            if (allFiles.length > 0) {
+                launchBtn.textContent = `Uploading ${allFiles.length} file(s)...`;
+                attachmentPaths = await uploadCampaignFiles(allFiles);
+            }
+            
+            launchBtn.textContent = 'Starting campaign...';
+            const contactFilter = getContactFilterFromSelect();
+            const result = await apiFetch('/api/campaigns', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    message,
+                    contact_filter: contactFilter,
+                    scheduled_for: scheduledFor,
+                    attachment_paths: attachmentPaths
+                })
+            });
+            closeModal('campaignModal');
+            await loadDashboardData();
+
+            if (result.scheduled || scheduledFor) {
+                showCampaignScheduled(name, scheduledFor, result.recipient_count || 0);
+            } else {
+                pollCampaignUntilDone(result.id, name);
+            }
+        } catch (err) {
+            alert(err.message || 'Could not launch campaign');
+        } finally {
+            launchBtn.disabled = false;
+            launchBtn.textContent = 'Launch Campaign';
+        }
+    });
+    
+    async function pollCampaignUntilDone(campaignId, name) {
+        if (activeProgressPoll) clearInterval(activeProgressPoll);
+        activeCampaignId = campaignId;
+        activeCampaignName = name;
+        showProgressModal(name);
+        let attempts = 0;
+        let retried = false;
+
+        const poll = async () => {
+            attempts++;
+            try {
+                const data = await apiFetch(`/api/campaigns/${campaignId}`);
+                updateProgressUI(data, name);
+
+                if (data.status === 'pending' && !data.scheduled_for && attempts >= 3 && !retried) {
+                    retried = true;
+                    await apiFetch(`/api/campaigns/${campaignId}/start`, { method: 'POST' });
+                }
+
+                if (data.status === 'completed') {
+                    clearInterval(activeProgressPoll);
+                    activeProgressPoll = null;
+                    activeCampaignId = null;
+                    hideProgressModal();
+                    await loadDashboardData();
+                    showCampaignSuccess(name, data.sent_count, data.recipient_count);
+                } else if (data.status === 'failed') {
+                    clearInterval(activeProgressPoll);
+                    activeProgressPoll = null;
+                    activeCampaignId = null;
+                    hideProgressModal();
+                    await loadDashboardData();
+                    showCampaignFailed(name, data.sent_count, data.recipient_count, data.error_message || '');
+                } else if (data.status === 'cancelled') {
+                    clearInterval(activeProgressPoll);
+                    activeProgressPoll = null;
+                    activeCampaignId = null;
+                    hideProgressModal();
+                    await loadDashboardData();
+                    alert(`Campaign "${name}" was cancelled. ${data.sent_count || 0} messages were sent before cancel.`);
+                } else if (data.status === 'paused') {
+                    updateProgressControls(data);
+                } else if (attempts >= 600) {
+                    clearInterval(activeProgressPoll);
+                    activeProgressPoll = null;
+                    activeCampaignId = null;
+                    hideProgressModal();
+                } else if (attempts % 5 === 0) {
+                    await loadDashboardData();
+                }
+            } catch (_) {
+                if (attempts >= 600) {
+                    clearInterval(activeProgressPoll);
+                    activeProgressPoll = null;
+                    activeCampaignId = null;
+                    hideProgressModal();
+                }
+            }
+        };
+
+        await poll();
+        activeProgressPoll = setInterval(poll, 1500);
+    }
+    
+    // Import Contacts CSV
+    document.getElementById('importContactsBtn')?.addEventListener('click', () => {
+        document.getElementById('csvFileInput').click();
+    });
+    
+    document.getElementById('csvFileInput')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const csvText = event.target.result;
+            const lines = csvText.split('\n');
+            const headers = lines[0].toLowerCase().split(',');
+            
+            const phoneIndex = headers.findIndex(h => h.includes('phone') || h.includes('mobile'));
+            const nameIndex = headers.findIndex(h => h.includes('name'));
+            const vehicleIndex = headers.findIndex(h => h.includes('vehicle') || h.includes('car'));
+            const tagsIndex = headers.findIndex(h => h.includes('tag'));
+            
+            const importedContacts = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                if (values.length < 2) continue;
+                
+                const contact = {
+                    phone: phoneIndex >= 0 ? values[phoneIndex]?.trim() : values[0]?.trim(),
+                    name: nameIndex >= 0 ? values[nameIndex]?.trim() : '',
+                    vehicle: vehicleIndex >= 0 ? values[vehicleIndex]?.trim() : '',
+                    tags: tagsIndex >= 0 ? values[tagsIndex]?.trim() : 'imported'
+                };
+                if (contact.phone) importedContacts.push(contact);
+            }
+            
+            if (importedContacts.length === 0) {
+                alert('No valid contacts found in CSV');
+                return;
+            }
+            
+            try {
+                const result = await apiFetch('/api/contacts/import', {
+                    method: 'POST',
+                    body: JSON.stringify({ contacts: importedContacts })
+                });
+                await loadDashboardData();
+                alert(`Imported ${result.imported} contacts!`);
+            } catch (err) {
+                alert(err.message || 'Import failed');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    });
+    
+    // Add Contact
+    document.getElementById('addContactBtn')?.addEventListener('click', () => {
+        updatePhonePrefix();
+        openModal('contactModal');
+    });
+    document.getElementById('closeContactModal')?.addEventListener('click', () => closeModal('contactModal'));
+    
+    document.getElementById('saveContact')?.addEventListener('click', async () => {
+        const phone = document.getElementById('contactPhone').value.trim();
+        const name = document.getElementById('contactName').value.trim();
+        const vehicle = document.getElementById('contactVehicle').value.trim();
+        const tagsRaw = document.getElementById('contactTags').value.trim();
+        const tags = tagsRaw || 'general';
+        
+        if (!phone) {
+            alert('Phone number is required');
+            return;
+        }
+        
+        try {
+            await apiFetch('/api/contacts', {
+                method: 'POST',
+                body: JSON.stringify({ phone, name, vehicle, tags })
+            });
+            await loadDashboardData();
+            closeModal('contactModal');
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactVehicle').value = '';
+            document.getElementById('contactTags').value = '';
+        } catch (err) {
+            alert(err.message || 'Could not save contact');
+        }
+    });
+    
+    // New Template
+    document.getElementById('newTemplateBtn')?.addEventListener('click', () => {
+        document.getElementById('templateName').value = '';
+        document.getElementById('templateContent').value = '';
+        openModal('templateModal');
+    });
+    
+    document.getElementById('closeTemplateModal')?.addEventListener('click', () => closeModal('templateModal'));
+    
+    document.getElementById('saveTemplate')?.addEventListener('click', async () => {
+        const name = document.getElementById('templateName').value.trim();
+        const content = document.getElementById('templateContent').value.trim();
+        
+        if (!name || !content) {
+            alert('Please fill template name and content');
+            return;
+        }
+        
+        try {
+            await apiFetch('/api/templates', {
+                method: 'POST',
+                body: JSON.stringify({ name, content })
+            });
+            await loadDashboardData();
+            closeModal('templateModal');
+        } catch (err) {
+            alert(err.message || 'Could not save template');
+        }
+    });
+    
+    // WhatsApp Add Account
+    document.getElementById('addWhatsAppBtn')?.addEventListener('click', () => {
+        openWhatsAppQrModal();
+    });
+    
+    document.getElementById('closeQrModal')?.addEventListener('click', async () => {
+        const sessionId = activeLinkSessionId;
+        stopQrPolling();
+        closeModal('qrModal');
+        if (sessionId) {
+            try {
+                const status = await apiFetch(`/api/whatsapp/sessions/${sessionId}/status`);
+                if (status.status === 'pending') {
+                    await apiFetch(`/api/whatsapp/sessions/${sessionId}`, { method: 'DELETE' });
+                    await loadDashboardData();
+                }
+            } catch (_) {}
+        }
+    });
+    
+    function reconnectWhatsApp(sessionId) {
+        openWhatsAppQrModal(sessionId);
+    }
+    
+    window.openCampaignDetail = openCampaignDetail;
+    window.reconnectWhatsApp = reconnectWhatsApp;
+    window.deleteContact = deleteContact;
+    window.deleteTemplate = deleteTemplate;
+    window.useTemplate = useTemplate;
+    window.deleteCampaign = deleteCampaign;
+    window.removeWhatsAppAccount = removeWhatsAppAccount;
+    window.refreshWhatsAppAccount = refreshWhatsAppAccount;
+    window.pauseActiveCampaign = pauseActiveCampaign;
+    window.resumeActiveCampaign = resumeActiveCampaign;
+    window.cancelActiveCampaign = cancelActiveCampaign;
+    window.openActiveCampaignDetail = openActiveCampaignDetail;
+    window.pauseDetailCampaign = pauseDetailCampaign;
+    window.resumeDetailCampaign = resumeDetailCampaign;
+    window.cancelDetailCampaign = cancelDetailCampaign;
+    window.retryFailedCampaign = retryFailedCampaign;
+    window.insertVariable = insertVariable;
+    
+    // Update character count on input
+    document.getElementById('campaignMessage')?.addEventListener('input', updateCharCount);
+    
+    // Save settings
+    document.getElementById('saveSettings')?.addEventListener('click', async () => {
+        const dailyLimit = parseInt(document.getElementById('dailyLimit').value, 10);
+        const countryCode = document.getElementById('countryCode').value.trim() || '91';
+        const sendDelayMin = parseInt(document.getElementById('sendDelayMin').value, 10);
+        const sendDelayMax = parseInt(document.getElementById('sendDelayMax').value, 10);
+        const rotateAccounts = document.getElementById('rotateAccounts').checked;
+        try {
+            const data = await apiFetch('/api/settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    daily_limit: dailyLimit,
+                    country_code: countryCode,
+                    send_delay_min: sendDelayMin,
+                    send_delay_max: sendDelayMax,
+                    rotate_accounts: rotateAccounts
+                })
+            });
+            defaultCountryCode = String(data.country_code || countryCode).replace(/\D/g, '') || '91';
+            document.getElementById('countryCode').value = defaultCountryCode;
+            updatePhonePrefix();
+            whatsappSessions.forEach(s => s.dailyLimit = dailyLimit);
+            renderWhatsAppAccounts();
+            alert('Settings saved.');
+        } catch (err) {
+            alert(err.message || 'Could not save settings');
+        }
+    });
+
+    function initDarkMode() {
+        const saved = localStorage.getItem('darkMode');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const dark = saved === 'true' || (saved === null && prefersDark);
+        document.documentElement.classList.toggle('dark', dark);
+        const icon = document.getElementById('darkModeIcon');
+        if (icon) icon.className = dark ? 'ri-sun-line text-lg' : 'ri-moon-line text-lg';
+    }
+
+    document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+        const dark = !document.documentElement.classList.contains('dark');
+        document.documentElement.classList.toggle('dark', dark);
+        localStorage.setItem('darkMode', dark);
+        document.getElementById('darkModeIcon').className = dark ? 'ri-sun-line text-lg' : 'ri-moon-line text-lg';
+        apiFetch('/api/analytics').then(updateCharts).catch(() => {});
+    });
+
+    initDarkMode();
+    
+    // Regenerate API Key
+    document.getElementById('regenerateApiKey')?.addEventListener('click', async () => {
+        try {
+            const data = await apiFetch('/api/settings/api-key', { method: 'POST' });
+            document.getElementById('apiKey').value = data.api_key;
+            alert('New API key generated.');
+        } catch (err) {
+            alert(err.message || 'Could not regenerate API key');
+        }
+    });
+    
+    // Charts initialized from real API data in loadDashboardData()
+    // Restore session if already logged in
+    const savedUser = localStorage.getItem('currentUser');
+    if (authToken && savedUser) {
+        try {
+            showDashboard(JSON.parse(savedUser));
+        } catch {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+        }
+    }
+</script>
+</body>
+</html>

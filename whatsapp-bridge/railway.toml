@@ -1,0 +1,8 @@
+# Bridge service — set root directory to whatsapp-bridge in Railway.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+restartPolicyType = "ON_FAILURE"

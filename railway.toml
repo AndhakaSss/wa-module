@@ -1,0 +1,8 @@
+# Web service (Flask) — set this folder as the service root in Railway.
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "gunicorn server:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120"
+healthcheckPath = "/"
+restartPolicyType = "ON_FAILURE"
