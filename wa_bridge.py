@@ -10,6 +10,15 @@ class BridgeError(Exception):
     pass
 
 
+def _needs_railway_port(url):
+    parsed = urlparse(url)
+    return bool(
+        parsed.hostname
+        and parsed.hostname.endswith('.railway.internal')
+        and not parsed.port
+    )
+
+
 def get_bridge_url():
     port = (
         os.environ.get('BRIDGE_PORT')
@@ -22,13 +31,19 @@ def get_bridge_url():
     if explicit.endswith(':'):
         explicit = explicit[:-1]
     if explicit:
-        return _with_port(explicit, port)
+        url = _with_port(explicit, port)
+        if _needs_railway_port(url):
+            url = _with_port(explicit, port or '8080')
+        return url
 
     host = (os.environ.get('BRIDGE_HOST') or '').strip()
     if host:
         if not host.startswith('http'):
             host = f'http://{host}'
-        return _with_port(host.rstrip('/'), port)
+        url = _with_port(host.rstrip('/'), port)
+        if _needs_railway_port(url):
+            url = _with_port(host.rstrip('/'), port or '8080')
+        return url
 
     return 'http://localhost:3001'
 
@@ -60,8 +75,7 @@ def _request(method, path, **kwargs):
     except requests.RequestException as exc:
         raise BridgeError(
             f'Cannot reach WhatsApp bridge at {get_bridge_url()}. '
-            f'On Railway, set WA_BRIDGE_URL=http://${{bridge.RAILWAY_PRIVATE_DOMAIN}}:${{bridge.PORT}} '
-            f'on the web service. ({exc})'
+            f'Set WA_BRIDGE_URL=http://bridge.railway.internal:8080 on the web service. ({exc})'
         ) from exc
 
     if response.status_code >= 400:
