@@ -595,6 +595,7 @@ def bridge_health():
     config = {
         'WA_BRIDGE_URL': os.environ.get('WA_BRIDGE_URL'),
         'BRIDGE_PORT': os.environ.get('BRIDGE_PORT'),
+        'BRIDGE_HTTP_PORT': os.environ.get('BRIDGE_HTTP_PORT'),
         'resolved_url': wa_bridge.get_bridge_url(),
     }
     try:
@@ -611,7 +612,10 @@ def bridge_health():
             'bridge_url': wa_bridge.get_bridge_url(),
             'config': config,
             'error': str(exc),
-            'hint': 'Set WA_BRIDGE_URL=http://${{bridge.RAILWAY_PRIVATE_DOMAIN}}:${{bridge.PORT}} on the web service Variables tab.'
+            'hint': (
+                'On bridge service add HTTP_PORT=${{PORT}}. '
+                'On web service set WA_BRIDGE_URL=http://${{bridge.RAILWAY_PRIVATE_DOMAIN}}:${{bridge.HTTP_PORT}}'
+            )
         }), 503
 
 @app.route('/api/register', methods=['POST'])

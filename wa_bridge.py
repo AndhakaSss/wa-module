@@ -11,24 +11,33 @@ class BridgeError(Exception):
 
 
 def get_bridge_url():
+    port = (
+        os.environ.get('BRIDGE_PORT')
+        or os.environ.get('BRIDGE_HTTP_PORT')
+        or os.environ.get('HTTP_PORT')
+        or ''
+    ).strip()
+
     explicit = (os.environ.get('WA_BRIDGE_URL') or '').strip().rstrip('/')
+    if explicit.endswith(':'):
+        explicit = explicit[:-1]
     if explicit:
-        return _with_port(explicit, os.environ.get('BRIDGE_PORT', '').strip())
+        return _with_port(explicit, port)
 
     host = (os.environ.get('BRIDGE_HOST') or '').strip()
     if host:
         if not host.startswith('http'):
             host = f'http://{host}'
-        return _with_port(host.rstrip('/'), os.environ.get('BRIDGE_PORT', '').strip())
+        return _with_port(host.rstrip('/'), port)
 
     return 'http://localhost:3001'
 
 
 def _with_port(base_url, port):
-    if not port:
-        return base_url
     parsed = urlparse(base_url)
     if parsed.port:
+        return base_url
+    if not port:
         return base_url
     host = parsed.hostname or ''
     netloc = f'{host}:{port}'
