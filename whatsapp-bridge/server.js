@@ -9,7 +9,7 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.WA_BRIDGE_PORT || 3001;
+const PORT = process.env.PORT || process.env.WA_BRIDGE_PORT || 3001;
 const WA_WEB_VERSION = '2.3000.1041023899';
 const WA_CACHE_DIR = path.join(__dirname, '.wwebjs_cache');
 // Chrome profile paths must stay short on Windows (MAX_PATH). The project folder is very deep.
