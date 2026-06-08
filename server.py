@@ -592,18 +592,26 @@ def serve_index():
 
 @app.route('/api/bridge/health', methods=['GET'])
 def bridge_health():
+    config = {
+        'WA_BRIDGE_URL': os.environ.get('WA_BRIDGE_URL'),
+        'BRIDGE_PORT': os.environ.get('BRIDGE_PORT'),
+        'resolved_url': wa_bridge.get_bridge_url(),
+    }
     try:
         payload = wa_bridge.health_check()
         return jsonify({
             'ok': True,
             'bridge_url': wa_bridge.get_bridge_url(),
+            'config': config,
             'bridge': payload
         }), 200
     except BridgeError as exc:
         return jsonify({
             'ok': False,
             'bridge_url': wa_bridge.get_bridge_url(),
-            'error': str(exc)
+            'config': config,
+            'error': str(exc),
+            'hint': 'Set WA_BRIDGE_URL=http://${{bridge.RAILWAY_PRIVATE_DOMAIN}}:${{bridge.PORT}} on the web service Variables tab.'
         }), 503
 
 @app.route('/api/register', methods=['POST'])
